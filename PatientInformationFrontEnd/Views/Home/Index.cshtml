@@ -1,0 +1,355 @@
+﻿@model PatientInformationFrontEnd.Models.PatientInformationView
+
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Index</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.4.1/dist/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+    <link href="~/css/stylesheet.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.css" integrity="sha512-3pIirOrwegjM6erE5gPSwkUzO+3cTjpnV9lexlNZqvupR64iZBnOOTiiLPb9M36zpMScbmUNIcHUqKD47M719g==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+</head>
+<body>
+    <div class="banner">
+        <div class="container p-5 customDesign" style="margin-bottom:20px;max-height: 96vh; overflow-x:scroll">
+            <div class="row">
+                <div class="col-md-2 mt-2">
+                    <label asp-for="Name" class="control-label">Patient Name</label> <span style="color:red;font-size: 20px;">*</span>
+                </div>
+                <div class="col-md-10 mt-2">
+                    <input asp-for="Name" class="form-control name" required /> 
+                    <span asp-validation-for="Name" class="text-danger"></span>
+                </div>
+                <div class="col-md-2 mt-2">
+                    <label asp-for="Epilepsy" class="control-label">Diseases Name</label> <span style="color:red;font-size: 20px;">*</span>
+                </div>
+                <div class="col-md-10 mt-2">
+                    <select class="form-control DiseaseInformations" data-live-search="true" required>
+                        @{
+                            foreach (var item in Model.DiseaseInformations)
+                            {
+                                <option value="@item.Id" selected>@item.Details</option>
+                            }
+                        }
+
+                    </select>
+                </div>
+                <div class="col-md-2 mt-2">
+                    <label asp-for="Epilepsy" class="control-label">Epilepsy</label> <span style="color:red;font-size: 20px;">*</span>
+                </div>
+                <div class="col-md-10 mt-2">
+                    <select class="form-control epilepsy" data-live-search="true" required>
+                        <option value="0" selected>Yes</option>
+                        <option value="1">No</option>
+                    </select>
+                </div>
+                <div class="col-md-2 mt-2">
+                    <label asp-for="Allergy" class="control-label">Other NCDs</label>
+                </div>
+                <div class="col-md-10 mt-2">
+                    <div class="d-flex" style="gap:10px">
+
+                        <select class="selectncd form-control" multiple data-live-search="true" asp-for="Allergy">
+                            @{
+                                foreach (var item in Model.NCDs)
+                                {
+                                    <option value="@item.Id">@item.Details</option>
+                                }
+                            }
+
+                        </select>
+                        <div class="d-flex align-items-center justify-content-center" style="flex-direction:column;gap:10px">
+                            <span id="AddNcd" style="cursor:pointer">Add</span>
+                            <span id="RemoveNcd" style="cursor:pointer">Remove</span>
+                        </div>
+
+                        <select class=" form-control selectedncd" multiple data-live-search="true" asp-for="Allergy">
+                        </select>
+                        @Html.ValidationMessageFor(model => model.Allergy, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+                <div class="col-md-2 mt-2">
+                    <label asp-for="Allergy" class="control-label">Allergies</label> <span style="color:red;font-size: 20px;">*</span>
+                </div>
+                <div class="col-md-10 mt-2">
+                    <div class="d-flex" style="gap:10px">
+
+                        <select class="selectAlergy form-control" multiple data-live-search="true" asp-for="Allergy">
+                            @{
+                                foreach (var item in Model.Allergies)
+                                {
+                                    <option value="@item.Id">@item.Details</option>
+                                }
+                            }
+
+                        </select>
+                        <div class="d-flex align-items-center justify-content-center" style="flex-direction:column;gap:10px">
+                            <span id="Add" style="cursor:pointer">Add</span>
+                            <span id="Remove" style="cursor:pointer">Remove</span>
+                            @*<button class="btn btn-success" >Add</button>*@
+                            @*<button class="btn btn-danger">Remove</button>*@
+                        </div>
+
+                        <select class=" form-control selectedAllergies" multiple data-live-search="true" asp-for="Allergy">
+                        </select>
+                        @*@Html.DropDownListFor(model => model.Allergy,new SelectList(Model.Allergies),  new { @class = "form-control"} )*@
+                        @Html.ValidationMessageFor(model => model.Allergy, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+
+                <div class="col-md-12 mt-2 d-flex justify-content-center">
+                    <span class="submitBtn btn btn-primary">Submit</span>
+                </div>
+            </div>
+            <br />
+            <br />
+            <div>
+                <table id="myTable" class="display">
+                    <thead>
+                        <tr>
+                            <th>Patient Name</th>
+                            <th>Diseases Name</th>
+                            <th>Epilepsy</th>
+                            <th>NCDs</th>
+                            <th>Allergies</th>
+                            <th>Create Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+
+                        @{
+                            foreach (var item in Model.PatientDetails)
+                            {
+                                <tr>
+                                    <td>@item.Name</td>
+                                    <td>@item.Disease.Details</td>
+                                    <td>@item.Epliepsy</td>
+                                    <td>
+                                        <ul>
+                                            @{
+                                                foreach (var ncd in item.NcdDetails)
+                                                {
+                                                    <li>@ncd.Ncd.Details</li>
+                                                }
+                                            }
+                                        </ul>
+                                    </td>
+                                    <td>
+                                        <ul>
+                                            @{
+                                                foreach (var allergies in item.AllergiesDetails)
+                                                {
+                                                    <li>@allergies.Allergie.Details</li>
+                                                }
+                                            }
+                                        </ul>
+                                    </td>
+                                    <td>
+                                        @item.CreationDate.ToString("dd/MMM/yyyy hh:mm tt")
+                                    </td>
+                                </tr>
+                            }
+                        }
+
+
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.js" integrity="sha512-sJa5KWq3F99QOeijUOm9O+BgDgVtzrWBBagZtjlW7F3I47NO1OaNJvbut+9KOPmjNr4Wb3blU4vQiQdi+Zk6wg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.4.1/dist/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js" integrity="sha512-VEd+nq25CkR676O+pLBnDW09R7VQX9Mdiij052gVCp5yVH3jGtH70Ho/UUv4mJDsEdTvqRCFZg0NKGiojGnUCw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script>
+        $(document).ready(function () {
+            toastr.options = {
+                "closeButton": true,
+                "debug": false,
+                "newestOnTop": false,
+                "progressBar": true,
+                "positionClass": "toast-bottom-right",
+                "preventDuplicates": false,
+                "onclick": null,
+                "showDuration": "300",
+                "hideDuration": "1000",
+                "timeOut": "5000",
+                "extendedTimeOut": "1000",
+                "showEasing": "swing",
+                "hideEasing": "linear",
+                "showMethod": "fadeIn",
+                "hideMethod": "fadeOut"
+            }
+
+
+
+            var selectedNcdsData = [{}];
+
+            $('#myTable').DataTable();
+
+            $("#Add").click(function () {
+                var allergyId = $('.selectAlergy').find(":selected").val();
+                var allergyText = $('.selectAlergy').find(":selected").text();
+
+                //alert("allergyId. " + allergyId + " allergyText: " + allergyText);
+                $('.selectedAllergies').append($('<option>', {
+                    value: allergyId,
+                    text: allergyText
+                }));
+                selectedNcdsData.push({
+                    value: allergyId,
+                    text: allergyText
+                })
+                $('.selectedNcdsData').text(selectedNcdsData);
+                console.log(selectedNcdsData);
+                $(".selectAlergy option[value=" + allergyId + "]").each(function () {
+                    $(this).remove();
+                });
+            });
+            $("#Remove").click(function () {
+                var allergyId = $('.selectedAllergies ').find(":selected").val();
+                var allergyText = $('.selectedAllergies').find(":selected").text();
+
+                //alert("allergyId. " + allergyId + " allergyText: " + allergyText);
+                $('.selectAlergy').append($('<option>', {
+                    value: allergyId,
+                    text: allergyText
+                }));
+                $(".selectedAllergies option[value=" + allergyId + "]").each(function () {
+                    $(this).remove();
+                });
+            });
+            $("#AddNcd").click(function () {
+                var ncdId = $('.selectncd').find(":selected").val();
+                var ncdText = $('.selectncd').find(":selected").text();
+
+                //alert("allergyId. " + allergyId + " allergyText: " + allergyText);
+                $('.selectedncd').append($('<option>', {
+                    value: ncdId,
+                    text: ncdText
+                }));
+                $(".selectncd option[value=" + ncdId + "]").each(function () {
+                    $(this).remove();
+                });
+            });
+            $("#RemoveNcd").click(function () {
+                var ncdId = $('.selectedncd ').find(":selected").val();
+                var ncdText = $('.selectedncd').find(":selected").text();
+
+                //alert("allergyId. " + allergyId + " allergyText: " + allergyText);
+                $('.selectncd').append($('<option>', {
+                    value: ncdId,
+                    text: ncdText
+                }));
+                $(".selectedncd option[value=" + ncdId + "]").each(function () {
+                    $(this).remove();
+                });
+            });
+
+            $(".submitBtn").click(function () {
+
+                var SelectedNCD = [];
+                $(".selectedncd option").each(function () {
+                    // Add $(this).val() to your list
+                    var tempData = {};
+                    tempData.Id = $(this).val();
+                    tempData.Details = $(this).text();
+                    SelectedNCD.push(tempData);
+                });
+
+                var notVerified = false;
+
+                var SelectedAllergiesData = [];
+                $(".selectedAllergies option").each(function () {
+                    // Add $(this).val() to your list
+                    var tempData = {};
+                    tempData.Id = $(this).val();
+                    tempData.Details = $(this).text();
+                    SelectedAllergiesData.push(tempData);
+                });
+
+                if (SelectedAllergiesData.length == 0) {
+                    notVerified = true;
+                    toastr["error"]("Please Add Allergies")
+                }
+                // else if (SelectedNCD.length == 0) {
+                //     notVerified = true;
+                //     toastr["error"]("Select NCDs")
+                // }
+
+
+                var DiseaseId = $('.DiseaseInformations ').find(":selected").val();
+                var DiseaseText = $('.DiseaseInformations').find(":selected").text();
+
+                var DiseaseInformations = {};
+                DiseaseInformations.Id = DiseaseId;
+                DiseaseInformations.Details = DiseaseText;
+
+
+                var epilepsyId = $('.epilepsy ').find(":selected").val();
+
+                var patientInformation = {};
+                patientInformation.Name = $(".name").val();
+                patientInformation.Epilepsy = epilepsyId;
+                patientInformation.SelectedNCDs = SelectedNCD;
+                patientInformation.SelectedAllergies = SelectedAllergiesData;
+                patientInformation.DiseaseInformation = DiseaseInformations;
+
+                if (patientInformation.Name == "") {
+                    notVerified = true;
+                    toastr["error"]("Select Patient Name")
+                }
+
+                if (!notVerified) {
+                    $.ajax({
+                        type: "POST",
+                        url: "Home/Index",
+                        data: patientInformation,
+                        success: function (result) {
+                            // alert("Data Save Successfully"); 
+                            toastr["success"]("Data Save Successfully")
+                            window.location.href = window.location.href;
+                        },
+                        error: function (result) {
+
+                        }
+                    });
+                }
+                else {
+                    // toastr["error"]("Validartion Error")
+                }
+
+
+            });
+
+
+
+        });
+    </script>
+    <style>
+        .banner {
+            background-image: url('assets/7283494.jpg');
+            align-items: center;
+            background-attachment: fixed;
+            background-repeat: no-repeat;
+            background-size: cover;
+            display: flex;
+            height: 100%;
+        }
+
+        .customDesign {
+            background: rgba(255,255,255, 0.9);
+        }
+    </style>
+</body>
+</html>
