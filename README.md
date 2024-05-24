@@ -17,6 +17,9 @@ Before you begin, ensure you have met the following requirements:
 2. **Clean and build the solution**
 
 3. **Migration**
+
+
+   ```bash
     dotnet ef database update
 
 4. **Go to the properties of solution. and select run multiple startup projects. Select api and MVC project to start**
